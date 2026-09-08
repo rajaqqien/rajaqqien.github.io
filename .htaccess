@@ -1,0 +1,57 @@
+# ============================================
+# .HTACCESS - Mobile Redirect
+# URL: https://rajaqqien.github.io/
+# ============================================
+
+RewriteEngine On
+
+# --- Redirect HP ke mobile.html ---
+# Mendeteksi user agent mobile dan tablet
+RewriteCond %{HTTP_USER_AGENT} "android|blackberry|iphone|ipod|ipad|opera mini|iemobile|windows phone|samsung|nokia|motorola|sonyericsson|lg|htc|huawei|xiaomi|oppo|vivo|realme|poco|redmi|oneplus|pixel" [NC]
+RewriteCond %{REQUEST_URI} ^/$ [OR]
+RewriteCond %{REQUEST_URI} ^/index\.html$ [OR]
+RewriteCond %{REQUEST_URI} ^/index\.htm$ RewriteRule ^(.*)$ /mobile.html [R=302,L]
+
+# --- Jika user mobile akses mobile.html langsung, biarkan ---
+RewriteCond %{HTTP_USER_AGENT} "android|blackberry|iphone|ipod|ipad|opera mini|iemobile|windows phone|samsung|nokia|motorola|sonyericsson|lg|htc|huawei|xiaomi|oppo|vivo|realme|poco|redmi|oneplus|pixel" [NC]
+RewriteRule ^mobile\.html$ - [L]
+
+# --- Jika user desktop akses mobile.html, redirect ke index ---
+RewriteCond %{HTTP_USER_AGENT} "!android|blackberry|iphone|ipod|ipad|opera mini|iemobile|windows phone|samsung|nokia|motorola|sonyericsson|lg|htc|huawei|xiaomi|oppo|vivo|realme|poco|redmi|oneplus|pixel" [NC]
+RewriteRule ^mobile\.html$ / [R=302,L]
+
+# --- Cache Control untuk gambar ---
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType image/gif "access plus 1 month"
+  ExpiresByType text/css "access plus 1 week"
+  ExpiresByType application/javascript "access plus 1 week"
+</IfModule>
+
+# --- Security Headers ---
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# --- Gzip Compression ---
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE text/css
+  AddOutputFilterByType DEFLATE application/javascript
+  AddOutputFilterByType DEFLATE application/json
+</IfModule>
+
+# --- Blokir akses file sensitif ---
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|sql)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# --- Custom Error Pages ---
+ErrorDocument 404 /index.html
